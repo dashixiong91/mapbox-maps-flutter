@@ -552,7 +552,7 @@ class StyleController(private val context: Context, private val styleManager: Ma
     layerIds: List<String>?,
     callback: (Result<Unit>) -> Unit
   ) {
-    styleManager.localizeLabels(Locale(locale), layerIds)
+    styleManager.localizeLabels(Locale.forLanguageTag(locale), layerIds)
     callback(Result.success(Unit))
   }
 
