@@ -4,11 +4,24 @@
 
 part of mapbox_maps_flutter;
 
+/// Enumeration of gesture states.
+enum GestureState {
+  /// Gesture has started.
+  started,
+
+  /// Gesture is in progress.
+  changed,
+
+  /// Gesture has ended.
+  ended,
+}
+
 /// A structure that defines additional information about map content gesture.
 class MapContentGestureContext {
   MapContentGestureContext({
     required this.touchPosition,
     required this.point,
+    required this.gestureState,
   });
 
   /// The location of gesture in Map view bounds.
@@ -17,18 +30,23 @@ class MapContentGestureContext {
   /// Geographical coordinate of the map gesture.
   Point point;
 
+  /// The state of the gesture.
+  GestureState gestureState;
+
   Object encode() {
     return <Object?>[
-      touchPosition.encode(),
-      point.encode(),
+      touchPosition,
+      point,
+      gestureState,
     ];
   }
 
   static MapContentGestureContext decode(Object result) {
     result as List<Object?>;
     return MapContentGestureContext(
-      touchPosition: ScreenCoordinate.decode(result[0]! as List<Object?>),
-      point: Point.decode(result[1]! as List<Object?>),
+      touchPosition: result[0]! as ScreenCoordinate,
+      point: result[1]! as Point,
+      gestureState: result[2]! as GestureState,
     );
   }
 }
@@ -46,6 +64,12 @@ class _GestureListenerCodec extends StandardMessageCodec {
     } else if (value is ScreenCoordinate) {
       buffer.putUint8(130);
       writeValue(buffer, value.encode());
+    } else if (value is MapContentGestureContext) {
+      buffer.putUint8(131);
+      writeValue(buffer, value.encode());
+    } else if (value is GestureState) {
+      buffer.putUint8(132);
+      writeValue(buffer, value.index);
     } else {
       super.writeValue(buffer, value);
     }
@@ -60,6 +84,11 @@ class _GestureListenerCodec extends StandardMessageCodec {
         return Point.decode(readValue(buffer)!);
       case 130:
         return ScreenCoordinate.decode(readValue(buffer)!);
+      case 131:
+        return MapContentGestureContext.decode(readValue(buffer)!);
+      case 132:
+        final int? value = readValue(buffer) as int?;
+        return value == null ? null : GestureState.values[value];
       default:
         return super.readValueOfType(type, buffer);
     }

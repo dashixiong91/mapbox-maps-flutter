@@ -16,6 +16,22 @@ private fun createConnectionError(channelName: String): FlutterError {
   return FlutterError("channel-error", "Unable to establish connection on channel: '$channelName'.", "")
 }
 
+/** Enumeration of gesture states. */
+enum class GestureState(val raw: Int) {
+  /** Gesture has started. */
+  STARTED(0),
+  /** Gesture is in progress. */
+  CHANGED(1),
+  /** Gesture has ended. */
+  ENDED(2);
+
+  companion object {
+    fun ofRaw(raw: Int): GestureState? {
+      return values().firstOrNull { it.raw == raw }
+    }
+  }
+}
+
 /**
  * A structure that defines additional information about map content gesture.
  *
@@ -25,21 +41,25 @@ data class MapContentGestureContext(
   /** The location of gesture in Map view bounds. */
   val touchPosition: ScreenCoordinate,
   /** Geographical coordinate of the map gesture. */
-  val point: Point
+  val point: Point,
+  /** The state of the gesture. */
+  val gestureState: GestureState
 
 ) {
   companion object {
-    @Suppress("UNCHECKED_CAST")
-    fun fromList(list: List<Any?>): MapContentGestureContext {
-      val touchPosition = ScreenCoordinate.fromList(list[0] as List<Any?>)
-      val point = PointDecoder.fromList(list[1] as List<Any?>)
-      return MapContentGestureContext(touchPosition, point)
+    @Suppress("LocalVariableName")
+    fun fromList(__pigeon_list: List<Any?>): MapContentGestureContext {
+      val touchPosition = __pigeon_list[0] as ScreenCoordinate
+      val point = __pigeon_list[1] as Point
+      val gestureState = __pigeon_list[2] as GestureState
+      return MapContentGestureContext(touchPosition, point, gestureState)
     }
   }
   fun toList(): List<Any?> {
-    return listOf<Any?>(
-      touchPosition.toList(),
-      point.toList(),
+    return listOf(
+      touchPosition,
+      point,
+      gestureState,
     )
   }
 }
@@ -62,6 +82,16 @@ private object GestureListenerCodec : StandardMessageCodec() {
           ScreenCoordinate.fromList(it)
         }
       }
+      131.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          MapContentGestureContext.fromList(it)
+        }
+      }
+      132.toByte() -> {
+        return (readValue(buffer) as Int?)?.let {
+          GestureState.ofRaw(it)
+        }
+      }
       else -> super.readValueOfType(type, buffer)
     }
   }
@@ -78,6 +108,14 @@ private object GestureListenerCodec : StandardMessageCodec() {
       is ScreenCoordinate -> {
         stream.write(130)
         writeValue(stream, value.toList())
+      }
+      is MapContentGestureContext -> {
+        stream.write(131)
+        writeValue(stream, value.toList())
+      }
+      is GestureState -> {
+        stream.write(132)
+        writeValue(stream, value.raw)
       }
       else -> super.writeValue(stream, value)
     }
