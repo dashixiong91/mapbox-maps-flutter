@@ -53,10 +53,17 @@ class MapboxMapsPlugin : FlutterPlugin, ActivityAware {
     _OfflineMapInstanceManager.setUp(binaryMessenger, offlineMapInstanceManager)
     _TileStoreInstanceManager.setUp(binaryMessenger, offlineMapInstanceManager)
     _OfflineSwitch.setUp(binaryMessenger, offlineSwitch)
-    LoggingController.setup(binaryMessenger)
+//     LoggingController.setup(binaryMessenger)
   }
 
   override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
+    val binaryMessenger = binding.binaryMessenger
+    _MapboxMapsOptions.setUp(binaryMessenger, null)
+    _MapboxOptions.setUp(binaryMessenger, null)
+    _SnapshotterInstanceManager.setUp(binaryMessenger, null)
+    _OfflineMapInstanceManager.setUp(binaryMessenger, null)
+    _TileStoreInstanceManager.setUp(binaryMessenger, null)
+    _OfflineSwitch.setUp(binaryMessenger, null)
   }
 
   override fun onAttachedToActivity(binding: ActivityPluginBinding) {

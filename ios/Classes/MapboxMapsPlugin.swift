@@ -23,7 +23,20 @@ public class MapboxMapsPlugin: NSObject, FlutterPlugin {
         _OfflineMapInstanceManagerSetup.setUp(binaryMessenger: binaryMessenger, api: offlineMapInstanceManager)
         _TileStoreInstanceManagerSetup.setUp(binaryMessenger: binaryMessenger, api: offlineMapInstanceManager)
         _OfflineSwitchSetup.setUp(binaryMessenger: binaryMessenger, api: OfflineSwitch.shared)
+        // LoggingController.setup(binaryMessenger)
+        
+        registrar.publish(MapboxMapsPlugin())
+    }
 
-        LoggingController.setup(binaryMessenger)
+
+    
+    public func detachFromEngine(for registrar: any FlutterPluginRegistrar) {
+        let binaryMessenger = registrar.messenger()
+        _MapboxOptionsSetup.setUp(binaryMessenger: binaryMessenger, api: nil)
+        _MapboxMapsOptionsSetup.setUp(binaryMessenger: binaryMessenger, api: nil)
+        _SnapshotterInstanceManagerSetup.setUp(binaryMessenger: binaryMessenger, api: nil)
+        _OfflineMapInstanceManagerSetup.setUp(binaryMessenger: binaryMessenger, api: nil)
+        _TileStoreInstanceManagerSetup.setUp(binaryMessenger: binaryMessenger, api: nil)
+        _OfflineSwitchSetup.setUp(binaryMessenger: binaryMessenger, api: nil)
     }
 }
