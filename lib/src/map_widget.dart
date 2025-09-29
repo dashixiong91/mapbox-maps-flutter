@@ -176,6 +176,7 @@ class _MapWidgetState extends State<MapWidget> {
   late final _MapEvents _events;
   bool _platformViewCreated = false;
   MapboxMap? mapboxMap;
+  bool _isDisposed = false;
 
   @override
   Widget build(BuildContext context) {
@@ -203,6 +204,7 @@ class _MapWidgetState extends State<MapWidget> {
 
   @override
   void dispose() {
+    _isDisposed = true;
     mapboxMap?.dispose();
     _suffixesRegistry.releaseSuffix(_suffix);
     _events.dispose();
@@ -239,7 +241,8 @@ class _MapWidgetState extends State<MapWidget> {
     _events._onResourceRequestListener = widget.onResourceRequestListener;
   }
 
-  Future<void> onPlatformViewCreated(int id) async {
+  void onPlatformViewCreated(int id) {
+    if (_isDisposed) return;
     final MapboxMap controller = MapboxMap(
       mapboxMapsPlatform: _mapboxMapsPlatform,
       onMapTapListener: widget.onTapListener,

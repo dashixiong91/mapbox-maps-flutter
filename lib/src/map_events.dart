@@ -15,7 +15,7 @@ final class _MapEvents {
   OnStyleImageMissingListener? _onStyleImageMissingListener;
   OnStyleImageUnusedListener? _onStyleImageUnusedListener;
   OnResourceRequestListener? _onResourceRequestListener;
-  late final MethodChannel _channel;
+  MethodChannel? _channel;
   List<_MapEvent> _subscribedEventTypes = [];
 
   List<_MapEvent> get eventTypes {
@@ -43,7 +43,7 @@ final class _MapEvents {
   _MapEvents({BinaryMessenger? binaryMessenger}) {
     _channel = MethodChannel('com.mapbox.maps.flutter.map_events',
         const StandardMethodCodec(), binaryMessenger);
-    _channel.setMethodCallHandler(_handleMethodCall);
+    _channel?.setMethodCallHandler(_handleMethodCall);
   }
 
   void updateSubscriptions() {
@@ -54,14 +54,15 @@ final class _MapEvents {
     }
 
     // let the native side know which events we are interested in
-    _channel.invokeMethod(
+    _channel?.invokeMethod(
         "subscribeToEvents", newEventTypes.map((e) => e.index).toList());
 
     _subscribedEventTypes = newEventTypes;
   }
 
   void dispose() {
-    _channel.setMethodCallHandler(null);
+    _channel?.setMethodCallHandler(null);
+    _channel = null;
   }
 
   Future<dynamic> _handleMethodCall(MethodCall call) async {
