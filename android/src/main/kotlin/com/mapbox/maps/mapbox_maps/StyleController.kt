@@ -483,8 +483,10 @@ class StyleController(private val context: Context, private val styleManager: Ma
       return
     }
 
-    val byteArray = ByteArray(image.data.buffer.capacity())
-    image.data.buffer.get(byteArray)
+    val buffer = image.data.buffer
+    buffer.rewind()
+    val byteArray = ByteArray(buffer.remaining())
+    buffer.get(byteArray)
     callback(
       Result.success(
         MbxImage(width = image.width.toLong(), height = image.height.toLong(), data = byteArray)
