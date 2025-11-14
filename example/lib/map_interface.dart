@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter/services.dart' show rootBundle, ByteData, Uint8List;
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 
 import 'page.dart';
@@ -61,6 +61,11 @@ class MapInterfacePageBodyState extends State<MapInterfacePageBody> {
     // });
     mapboxMap?.style.styleLayerExists("points").then((value) async {
       if (!value) {
+        final ByteData bytes =
+            await rootBundle.load('assets/symbols/custom-icon.png');
+        final Uint8List list = bytes.buffer.asUint8List();
+        mapboxMap?.style.addStyleImage("icon", 1.0,
+            MbxImage(width: 40, height: 40, data: list), false, [], [], null);
         var layer = await rootBundle.loadString('assets/point_layer.json');
         mapboxMap?.style.addStyleLayer(layer, null);
       }
