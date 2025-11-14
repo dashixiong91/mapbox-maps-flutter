@@ -224,7 +224,7 @@ class MapInterfacePageBodyState extends State<MapInterfacePageBody> {
       onPressed: () {
         mapboxMap?.getDebug().then(
             (value) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text("getDebugOptions: ${value.first}"),
+                  content: Text("getDebugOptions: ${value.firstOrNull}"),
                   backgroundColor: Theme.of(context).primaryColor,
                   duration: Duration(seconds: 2),
                 )));

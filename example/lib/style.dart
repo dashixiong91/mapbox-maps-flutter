@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -28,7 +29,6 @@ class StylePageBodyState extends State<StylePageBody> {
 
   MapboxMap? mapboxMap;
   var mapProject = StyleProjectionName.globe;
-  var locale = 'en';
 
   _onMapCreated(MapboxMap mapboxMap) {
     this.mapboxMap = mapboxMap;
@@ -461,11 +461,8 @@ class StylePageBodyState extends State<StylePageBody> {
     return TextButton(
       child: Text('changeLocale'),
       onPressed: () {
-        if (locale == 'en') {
-          locale = 'de';
-        } else {
-          locale = 'en';
-        }
+        final langList = ["en", "de","zh-Hans","zh-Hant"];
+        final locale= langList.elementAt(Random().nextInt(langList.length));
         mapboxMap?.style.localizeLabels(locale, null);
       },
     );
@@ -475,6 +472,7 @@ class StylePageBodyState extends State<StylePageBody> {
   Widget build(BuildContext context) {
     final MapWidget mapWidget = MapWidget(
         key: ValueKey("mapWidget"),
+        styleUri: MapboxStyles.MAPBOX_STREETS,
         onMapCreated: _onMapCreated,
         onStyleLoadedListener: _onStyleLoaded);
 
